@@ -97,13 +97,6 @@ function provision_kubernetes_applications_aws_eks () {
   aws_eks_environment
 
   export TF_VAR_region="$AWS_PRIMARY_REGION"
-  export TF_VAR_project_path="${__project_dir}"
-  export TF_VAR_project_wait="$PROJECT_UPDATE_WAIT"
-  export TF_VAR_argocd_admin_password="$("${__bin_dir}/argocd" account bcrypt --password "${ARGOCD_ADMIN_PASSWORD:-admin}")"
-
-  if [ ! -z "${ARGOCD_PROJECT_SEQUENCE}" ]; then
-    export TF_VAR_argocd_project_sequence="${ARGOCD_PROJECT_SEQUENCE}"
-  fi
 
   load_hook aws_variables
 
