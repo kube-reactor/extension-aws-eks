@@ -13,10 +13,6 @@ export __aws_infrastructure_project_dir="${__aws_eks_terraform_dir}/infrastructu
 export __aws_cluster_project_dir="${__aws_eks_terraform_dir}/kubernetes-cluster"
 export __aws_applications_project_dir="${__aws_eks_terraform_dir}/applications"
 #
-# Kubernetes Provider
-#
-export KUBERNETES_PROVIDER=aws_eks
-#
 # State
 #
 export TF_VAR_terraform_user="$AWS_TERRAFORM_USER"
