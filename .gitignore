@@ -11,6 +11,10 @@
 /.vscode
 *.code-workspace
 
+# Terraform files
+*.terraform.lock.hcl
+*.tfstate*
+
 # Extra files
 /tmp/
 *.log
