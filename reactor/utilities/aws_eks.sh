@@ -22,13 +22,6 @@ function aws_eks_environment () {
 }
 
 function install_kubernetes_aws_eks () {
-  if ! which aws; then
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" 1>>"$(logfile)" 2>&1
-    unzip awscliv2.zip 1>>"$(logfile)" 2>&1
-    sudo ./aws/install 1>>"$(logfile)" 2>&1
-    rm -f awscliv2.zip 1>>"$(logfile)" 2>&1
-  fi
-
   if [[ ! "$AWS_STATE_KMS_KEY_ID" ]] || [[ ! "$AWS_STATE_DYNAMODB_ID" ]]; then
     export TF_VAR_bucket_name="${APP_NAME}-tfstate"
     export TF_VAR_region="$AWS_PRIMARY_REGION"
