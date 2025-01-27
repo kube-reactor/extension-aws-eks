@@ -11,7 +11,7 @@ module "remote_state" {
 }
 
 resource "aws_iam_user" "terraform" {
-  name = "TerraformUser"
+  name = var.terraform_user
 }
 
 resource "aws_iam_user_policy_attachment" "remote_state_access" {

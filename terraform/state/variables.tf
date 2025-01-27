@@ -14,3 +14,9 @@ variable "replica_region" {
   type        = string
   default     = "us-west-1"
 }
+
+variable "terraform_user" {
+  description = "The username of the user that provisions infrastructure through Terraform."
+  type        = string
+  default     = "TerraformUser"
+}
