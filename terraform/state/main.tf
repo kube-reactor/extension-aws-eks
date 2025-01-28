@@ -3,6 +3,8 @@ module "remote_state" {
   override_s3_bucket_name = true
   s3_bucket_name          = var.bucket_name
   s3_bucket_name_replica  = "${var.bucket_name}-replica"
+  kms_key_alias           = var.bucket_name
+  dynamodb_table_name     = var.bucket_name
 
   providers = {
     aws         = aws
