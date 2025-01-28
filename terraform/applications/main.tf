@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 module "argocd-apps" {
-  source = "../argocd-apps/gateway"
+  source = "../../../../terraform/argocd-apps/gateway"
 
   domain      = var.domain
   environment = var.environment
