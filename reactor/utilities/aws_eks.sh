@@ -1,5 +1,5 @@
 
-function aws_eks_environment () {
+function aws_cluster_environment () {
   if [ "${__project_dir:-}" ]; then
     debug "Setting AWS environment ..."
     export AWS_PRIMARY_REGION="${AWS_PRIMARY_REGION:-"us-east-1"}"
@@ -20,35 +20,9 @@ function aws_eks_environment () {
   fi
 }
 
-function install_kubernetes_aws_eks () {
-  aws_eks_environment
-
-  if [ ! "$AWS_STATE_KMS_KEY_ID" ]; then
-    export TF_VAR_bucket_name="$AWS_STATE_BUCKET_NAME"
-    export TF_VAR_region="$AWS_PRIMARY_REGION"
-    export TF_VAR_replica_region="$AWS_SECONDARY_REGION"
-
-    load_hook aws_variables
-
-    if [ ! "${__aws_state_project_dir}" ]; then
-      emergency "In order to provision Terraform remote state on AWS you must specify the '__aws_state_project_dir' environment variable in the project to map to a Terraform module"
-    fi
-
-    info "Deploying Terraform Remote State ..."
-    run_terraform "${__aws_state_project_dir}" state
-
-    export AWS_STATE_KMS_KEY_ID="$(jq -r ".kms_key.value" "${__env_dir}/state.json")"
-
-    run_hook aws_eks_state
-
-    sed -i -e \
-      "s/AWS_STATE_KMS_KEY_ID\=\"\"/AWS_STATE_KMS_KEY_ID\=\"${AWS_STATE_KMS_KEY_ID}\"/" \
-      "${__env_dir}/secret.sh"
-  fi
-}
 
 function kubernetes_status_aws_eks () {
-  aws_eks_environment
+  aws_cluster_environment
 
   if [ "${APP_NAME:-}" ]; then
     if aws eks describe-cluster --name "$APP_NAME" --region "$AWS_PRIMARY_REGION" 1>/dev/null 2>&1; then
@@ -70,7 +44,7 @@ function add_container_environment_aws_eks () {
 
 
 function start_kubernetes_aws_eks () {
-  aws_eks_environment
+  aws_cluster_environment
 
   export TF_VAR_region="$AWS_PRIMARY_REGION"
 
@@ -84,24 +58,16 @@ function start_kubernetes_aws_eks () {
   fi
 
   info "Managing Infrastructure ..."
-  run_terraform "${__aws_infrastructure_project_dir}" infrastructure \
-    -backend-config="bucket=${AWS_STATE_BUCKET_NAME}" \
-    -backend-config="kms_key_id=${AWS_STATE_KMS_KEY_ID}" \
-    -backend-config="dynamodb_table=${AWS_STATE_BUCKET_NAME}" \
-    -backend-config="region=${AWS_PRIMARY_REGION}"
+  run_provisioner "${__aws_infrastructure_project_dir}" infrastructure
 
   info "Managing Kubernetes Cluster ..."
-  run_terraform "${__aws_cluster_project_dir}" cluster \
-    -backend-config="bucket=${AWS_STATE_BUCKET_NAME}" \
-    -backend-config="kms_key_id=${AWS_STATE_KMS_KEY_ID}" \
-    -backend-config="dynamodb_table=${AWS_STATE_BUCKET_NAME}" \
-    -backend-config="region=${AWS_PRIMARY_REGION}"
+  run_provisioner "${__aws_cluster_project_dir}" cluster
 
   run_hook start_aws_eks
 }
 
 function provision_kubernetes_applications_aws_eks () {
-  aws_eks_environment
+  aws_cluster_environment
 
   export TF_VAR_region="$AWS_PRIMARY_REGION"
 
@@ -118,19 +84,14 @@ function provision_kubernetes_applications_aws_eks () {
     --kubeconfig "$KUBECONFIG" 1>>"$(logfile)" 2>&1
 
   info "Managing ArgoCD Applications ..."
-  run_terraform "${__aws_applications_project_dir}" applications \
-    -backend-config="bucket=${AWS_STATE_BUCKET_NAME}" \
-    -backend-config="kms_key_id=${AWS_STATE_KMS_KEY_ID}" \
-    -backend-config="dynamodb_table=${AWS_STATE_BUCKET_NAME}" \
-    -backend-config="region=${AWS_PRIMARY_REGION}"
+  run_provisioner "${__aws_applications_project_dir}" applications
 
   run_hook start_aws_eks_applications
 }
 
 function destroy_kubernetes_aws_eks () {
-  aws_eks_environment
+  aws_cluster_environment
 
-  export TERRAFORM_DESTROY="True"
   export TF_VAR_region="$AWS_PRIMARY_REGION"
 
   load_hook aws_variables
@@ -142,19 +103,20 @@ function destroy_kubernetes_aws_eks () {
     emergency "In order to provision Kubernetes cluster you must specify the '__aws_cluster_project_dir' environment variable in the project to map to a Terraform module"
   fi
 
+  info "Saving kubeconfig file ..."
+  aws eks update-kubeconfig \
+    --region "$AWS_PRIMARY_REGION" \
+    --name "$APP_NAME" \
+    --kubeconfig "$KUBECONFIG" 1>>"$(logfile)" 2>&1
+
+  info "Destroying ArgoCD Applications ..."
+  run_provisioner_destroy "${__aws_applications_project_dir}" applications
+
   info "Destroying Kubernetes Cluster ..."
-  run_terraform "${__aws_cluster_project_dir}" cluster \
-    -backend-config="bucket=${AWS_STATE_BUCKET_NAME}" \
-    -backend-config="kms_key_id=${AWS_STATE_KMS_KEY_ID}" \
-    -backend-config="dynamodb_table=${AWS_STATE_BUCKET_NAME}" \
-    -backend-config="region=${AWS_PRIMARY_REGION}"
+  run_provisioner_destroy "${__aws_cluster_project_dir}" cluster
 
   info "Destroying Infrastructure ..."
-  run_terraform "${__aws_infrastructure_project_dir}" infrastructure \
-    -backend-config="bucket=${AWS_STATE_BUCKET_NAME}" \
-    -backend-config="kms_key_id=${AWS_STATE_KMS_KEY_ID}" \
-    -backend-config="dynamodb_table=${AWS_STATE_BUCKET_NAME}" \
-    -backend-config="region=${AWS_PRIMARY_REGION}"
+  run_provisioner_destroy "${__aws_infrastructure_project_dir}" infrastructure
 
   run_hook destroy_aws_eks
 }
