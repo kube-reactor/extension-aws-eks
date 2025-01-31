@@ -72,19 +72,3 @@ variable "eks_max_app_nodes" {
   type        = number
   default     = 1
 }
-
-variable "alb_name" {
-  type        = string
-  description = "Name of EKS's alb"
-}
-
-variable "access_logs_bucket_name" {
-  type        = string
-  description = "Access logs bucket name. It is creating during the provisioning."
-}
-
-variable "eks_node_port" {
-  type        = string
-  default     = ""
-  description = "EKS Cluster node port."
-}

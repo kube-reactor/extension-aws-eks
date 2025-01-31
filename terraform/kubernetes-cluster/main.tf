@@ -18,16 +18,3 @@ module "aws-eks" {
   min_app_nodes          = var.eks_min_app_nodes
   max_app_nodes          = var.eks_max_app_nodes
 }
-
-# module "alb" {
-#   source = "../modules/aws-alb"
-
-#   region   = var.region
-#   vpc_cidr = var.vpc_cidr
-
-#   name      = var.alb_name
-#   domain    = var.domain
-#   node_port = var.eks_node_port
-
-#   bucket_name = var.access_logs_bucket_name
-# }

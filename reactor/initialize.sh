@@ -46,11 +46,7 @@ export TF_VAR_eks_max_ops_nodes="$AWS_OPS_NODE_MAX_COUNT"
 export TF_VAR_eks_app_node_instance_type="$AWS_APP_NODE_TYPE"
 export TF_VAR_eks_min_app_nodes="$AWS_APP_NODE_MIN_COUNT"
 export TF_VAR_eks_max_app_nodes="$AWS_APP_NODE_MAX_COUNT"
-
-export TF_VAR_eks_node_port="$GATEWAY_NODE_PORT"
 #
 # Load Balancer
 #
-export TF_VAR_alb_name="$APP_NAME"
 export TF_VAR_domain="$PRIMARY_DOMAIN"
-export TF_VAR_access_logs_bucket_name="$APP_NAME"
