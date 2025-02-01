@@ -86,8 +86,33 @@ function provision_kubernetes_applications_aws_eks () {
   info "Managing ArgoCD Applications ..."
   run_provisioner "${__aws_applications_project_dir}" applications
 
-  run_hook start_aws_eks_applications
+  run_hook provision_aws_eks_applications
 }
+
+
+function destroy_kubernetes_applications_aws_eks () {
+  aws_cluster_environment
+
+  export TF_VAR_region="$AWS_PRIMARY_REGION"
+
+  load_hook aws_variables
+
+  if [ ! "${__aws_applications_project_dir}" ]; then
+    emergency "In order to provision Kubernetes applications you must specify the '__aws_applications_project_dir' environment variable in the project to map to a Terraform module"
+  fi
+
+  info "Saving kubeconfig file ..."
+  aws eks update-kubeconfig \
+    --region "$AWS_PRIMARY_REGION" \
+    --name "$APP_NAME" \
+    --kubeconfig "$KUBECONFIG" 1>>"$(logfile)" 2>&1
+
+  info "Destroying ArgoCD Applications ..."
+  run_provisioner_destroy "${__aws_applications_project_dir}" applications
+
+  run_hook destroy_aws_eks_applications
+}
+
 
 function destroy_kubernetes_aws_eks () {
   aws_cluster_environment
@@ -102,15 +127,6 @@ function destroy_kubernetes_aws_eks () {
   if [ ! "${__aws_cluster_project_dir}" ]; then
     emergency "In order to provision Kubernetes cluster you must specify the '__aws_cluster_project_dir' environment variable in the project to map to a Terraform module"
   fi
-
-  info "Saving kubeconfig file ..."
-  aws eks update-kubeconfig \
-    --region "$AWS_PRIMARY_REGION" \
-    --name "$APP_NAME" \
-    --kubeconfig "$KUBECONFIG" 1>>"$(logfile)" 2>&1
-
-  info "Destroying ArgoCD Applications ..."
-  run_provisioner_destroy "${__aws_applications_project_dir}" applications
 
   info "Destroying Kubernetes Cluster ..."
   run_provisioner_destroy "${__aws_cluster_project_dir}" cluster
