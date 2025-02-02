@@ -22,9 +22,4 @@ terraform {
       version = "~> 2.3.4"
     }
   }
-
-  backend "s3" {
-    key     = "cluster/terraform.tfstate"
-    encrypt = true
-  }
 }

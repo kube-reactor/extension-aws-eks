@@ -22,11 +22,6 @@ terraform {
       version = "~> 2.3.4"
     }
   }
-
-  backend "s3" {
-    key     = "infrastructure/terraform.tfstate"
-    encrypt = true
-  }
 }
 
 provider "aws" {
