@@ -8,17 +8,24 @@
 export __aws_eks_extension_dir="${2}"
 export __aws_eks_terraform_dir="${__aws_eks_extension_dir}/terraform"
 
-export __aws_state_project_dir="${__aws_eks_terraform_dir}/state"
 export __aws_infrastructure_project_dir="${__aws_eks_terraform_dir}/infrastructure"
 export __aws_cluster_project_dir="${__aws_eks_terraform_dir}/kubernetes-cluster"
 export __aws_applications_project_dir="${__aws_eks_terraform_dir}/applications"
 #
-# State
+# AWS
 #
-export TF_VAR_terraform_user="$AWS_TERRAFORM_USER"
+export AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID:-}"
+export AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY:-}"
+
+if [[ ! "$AWS_ACCESS_KEY_ID" ]] || [[ ! "$AWS_SECRET_ACCESS_KEY" ]]; then
+  emergency "To provision AWS resources, you must specify AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables"
+fi
+
+export AWS_EKS_REGION="${AWS_EKS_REGION:-"us-east-1"}"
 #
 # Networking
 #
+export TF_VAR_region="$AWS_EKS_REGION"
 export TF_VAR_vpc_name="$APP_NAME"
 
 export TF_VAR_vpc_cidr="$AWS_VPC_CIDR"
