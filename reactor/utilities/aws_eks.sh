@@ -1,9 +1,7 @@
 
 function kubernetes_status_aws_eks () {
-  if [ "${APP_NAME:-}" ]; then
-    if aws eks describe-cluster --name "$APP_NAME" --region "$AWS_EKS_REGION" 1>/dev/null 2>&1; then
-      return 0
-    fi
+  if aws eks describe-cluster --name "$APP_NAME" --region "$AWS_EKS_REGION" 1>/dev/null 2>&1; then
+    return 0
   fi
   return 1
 }
