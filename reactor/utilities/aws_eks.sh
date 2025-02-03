@@ -15,6 +15,11 @@ function add_container_environment_aws_eks () {
       --name "$APP_NAME" \
       --kubeconfig "$KUBECONFIG" 1>>"$(logfile)" 2>&1
   fi
+
+  if [ ! "${AWS_ACCOUNT_ID:-}" ]; then
+    export AWS_ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
+  fi
+  export AWS_ECR_REGISTRY_DOMAIN="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_EKS_REGION}.amazonaws.com"
 }
 
 
