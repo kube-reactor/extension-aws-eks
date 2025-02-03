@@ -12,3 +12,8 @@ output "public_subnet_ids" {
   description = "AWS VPC Public Subnets"
   value       = module.vpc.public_subnets
 }
+
+output "repository_urls" {
+  description = "The URL of the repositories (in the form aws_account_id.dkr.ecr.region.amazonaws.com/repositoryName)."
+  value       = module.ecr.repository_urls
+}
