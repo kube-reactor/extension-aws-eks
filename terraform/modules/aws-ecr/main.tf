@@ -1,6 +1,9 @@
 
 data "aws_iam_policy_document" "readonly_access" {
-  for_each = var.repositories
+  for_each = {
+    for key, value in var.repositories : key => value
+    if length(value.ro_accounts) > 0
+  }
 
   statement {
     sid    = "ECRReadonlyAccess"
@@ -8,7 +11,7 @@ data "aws_iam_policy_document" "readonly_access" {
 
     principals {
       type        = "AWS"
-      identifiers = try(each.value.ro_accounts, [])
+      identifiers = each.value.ro_accounts
     }
 
     actions = [
@@ -28,7 +31,10 @@ data "aws_iam_policy_document" "readonly_access" {
 }
 
 data "aws_iam_policy_document" "push_access" {
-  for_each = var.repositories
+  for_each = {
+    for key, value in var.repositories : key => value
+    if length(value.rw_accounts) > 0
+  }
 
   statement {
     sid    = "ECRPushAccess"
@@ -36,7 +42,7 @@ data "aws_iam_policy_document" "push_access" {
 
     principals {
       type        = "AWS"
-      identifiers = try(each.value.rw_accounts, [])
+      identifiers = each.value.rw_accounts
     }
 
     actions = [
@@ -61,17 +67,17 @@ resource "aws_ecr_repository" "apps" {
     scan_on_push = var.scan_images_on_push
   }
 
-  tags = try(each.value.tags, {})
+  tags = each.value.tags
 }
 
 resource "aws_ecr_repository_policy" "readonly_access" {
-  for_each   = var.repositories
+  for_each   = data.aws_iam_policy_document.readonly_access
   repository = each.key
-  policy     = data.aws_iam_policy_document.readonly_access[each.key].json
+  policy     = each.value.json
 }
 
 resource "aws_ecr_repository_policy" "push_access" {
-  for_each   = var.repositories
+  for_each   = data.aws_iam_policy_document.push_access
   repository = each.key
-  policy     = data.aws_iam_policy_document.push_access[each.key].json
+  policy     = each.value.json
 }

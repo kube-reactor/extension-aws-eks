@@ -34,9 +34,10 @@ export TF_VAR_public_subnet_cidrs="$AWS_VPC_PUBLIC_SUBNET_CIDRS"
 #
 # Container Registry
 #
-export TF_VAR_repository_name="$APP_NAME"
-export TF_VAR_principals_readonly_access="$AWS_ECR_PRINCIPLES_READONLY_ACCESS"
-export TF_VAR_principals_push_access="$AWS_ECR_PRINCIPLES_PUSH_ACCESS"
+export TF_VAR_repositories="${AWS_ECR_REPOSITORIES:-"\{\}"}"
+export TF_VAR_force_delete="${AWS_ECR_FORCE_DELETE:-false}"
+export TF_VAR_image_tag_mutability="${AWS_ECR_IMAGE_TAG_MUTABILITY:-MUTABLE}"
+export TF_VAR_scan_images_on_push="${AWS_ECR_SCAN_IMAGES_ON_PUSH:-false}"
 #
 # Kubernetes Cluster
 #
