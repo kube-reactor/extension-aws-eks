@@ -1,14 +1,14 @@
-data "aws_partition" "current" {}
 
 data "aws_iam_policy_document" "readonly_access" {
-  count = length(var.principals_readonly_access) > 0 ? 1 : 0
+  for_each = var.repositories
+
   statement {
     sid    = "ECRReadonlyAccess"
     effect = "Allow"
 
     principals {
       type        = "AWS"
-      identifiers = var.principals_readonly_access
+      identifiers = try(each.value.ro_accounts, [])
     }
 
     actions = [
@@ -27,14 +27,8 @@ data "aws_iam_policy_document" "readonly_access" {
   }
 }
 
-resource "aws_ecr_repository_policy" "readonly_access" {
-  count = length(var.principals_readonly_access) > 0 ? 1 : 0
-  repository = aws_ecr_repository.this.name
-  policy     = data.aws_iam_policy_document.readonly_access[0].json
-}
-
 data "aws_iam_policy_document" "push_access" {
-  count = length(var.principals_push_access) > 0 ? 1 : 0
+  for_each = var.repositories
 
   statement {
     sid    = "ECRPushAccess"
@@ -42,7 +36,7 @@ data "aws_iam_policy_document" "push_access" {
 
     principals {
       type        = "AWS"
-      identifiers = var.principals_push_access
+      identifiers = try(each.value.rw_accounts, [])
     }
 
     actions = [
@@ -56,14 +50,10 @@ data "aws_iam_policy_document" "push_access" {
   }
 }
 
-resource "aws_ecr_repository_policy" "push_access" {
-  count = length(var.principals_push_access) > 0 ? 1 : 0
-  repository = aws_ecr_repository.this.name
-  policy     = data.aws_iam_policy_document.push_access[0].json
-}
+resource "aws_ecr_repository" "apps" {
+  for_each = var.repositories
 
-resource "aws_ecr_repository" "this" {
-  name                 = var.name
+  name                 = each.key
   image_tag_mutability = var.image_tag_mutability
   force_delete         = var.force_delete
 
@@ -71,5 +61,17 @@ resource "aws_ecr_repository" "this" {
     scan_on_push = var.scan_images_on_push
   }
 
-  tags = var.tags
+  tags = try(each.value.tags, {})
+}
+
+resource "aws_ecr_repository_policy" "readonly_access" {
+  for_each   = var.repositories
+  repository = each.key
+  policy     = data.aws_iam_policy_document.readonly_access[each.key].json
+}
+
+resource "aws_ecr_repository_policy" "push_access" {
+  for_each   = var.repositories
+  repository = each.key
+  policy     = data.aws_iam_policy_document.push_access[each.key].json
 }
