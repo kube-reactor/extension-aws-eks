@@ -5,8 +5,6 @@
 #
 # Project Directories
 #
-echo "loading eks environment ..."
-echo "$2"
 export __aws_eks_extension_dir="${2}"
 export __aws_eks_terraform_dir="${__aws_eks_extension_dir}/terraform"
 
