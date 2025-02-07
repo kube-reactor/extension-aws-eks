@@ -40,7 +40,11 @@ function provision_kubernetes_applications_aws_eks () {
 
 function destroy_kubernetes_applications_aws_eks () {
   add_container_environment_aws_eks
-  provisioner_delete applications "${__aws_applications_project_dir}"
+  if [ "${PROVISIONER_FORCE_DELETE_APPLICATIONS:-}" ]; then
+    provisioner_delete applications "${__aws_applications_project_dir}"
+  else
+    provisioner_destroy applications "${__aws_applications_project_dir}"
+  fi
 }
 
 function destroy_kubernetes_aws_eks () {
