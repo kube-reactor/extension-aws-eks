@@ -12,7 +12,7 @@ export __aws_infrastructure_project_dir="${__aws_eks_terraform_dir}/infrastructu
 export __aws_cluster_project_dir="${__aws_eks_terraform_dir}/kubernetes-cluster"
 export __aws_applications_project_dir="${__aws_eks_terraform_dir}/applications"
 
-if [ "$KUBERNETES_PROVIDER" == "aws_eks" ]; then
+if [ "${KUBERNETES_PROVIDER:-}" == "aws_eks" ]; then
   #
   # AWS
   #
