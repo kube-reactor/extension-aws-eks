@@ -8,10 +8,17 @@ function kubernetes_status_aws_eks () {
 
 function add_container_environment_aws_eks () {
   if kubernetes_status_aws_eks; then
-    aws eks update-kubeconfig \
-      --region "$AWS_EKS_REGION" \
-      --name "$APP_NAME" \
-      --kubeconfig "$KUBECONFIG" 1>>"$(logfile)" 2>&1
+    if [ ! "${REACTOR_SHELL_OUTPUT:-}" ]; then
+      aws eks update-kubeconfig \
+        --region "$AWS_EKS_REGION" \
+        --name "$APP_NAME" \
+        --kubeconfig "$KUBECONFIG" 1>>"$(logfile)" 2>&1
+    else
+        aws eks update-kubeconfig \
+        --region "$AWS_EKS_REGION" \
+        --name "$APP_NAME" \
+        --kubeconfig "$KUBECONFIG" 1>/dev/null 2>&1
+    fi
   fi
 
   if [ ! "${AWS_ACCOUNT_ID:-}" ]; then
