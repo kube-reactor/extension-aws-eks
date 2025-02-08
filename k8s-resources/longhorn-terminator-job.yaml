@@ -1,0 +1,65 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubernetes.io/enforce-mountable-secrets: "true"
+  name: longhorn-terminator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: longhorn-terminator
+rules:
+- apiGroups:
+  - "*"
+  resources:
+  - namespaces
+  verbs:
+  - '*'
+- apiGroups:
+  - ""
+  resources:
+  - namespaces/finalize
+  - namespaces/status
+  verbs:
+  - update
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: longhorn-terminator
+subjects:
+- kind: ServiceAccount
+  name: longhorn-terminator
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: longhorn-terminator
+  annotations:
+    argocd.argoproj.io/hook: PostDelete
+spec:
+  template:
+    spec:
+      serviceAccountName: longhorn-terminator
+      containers:
+      - name: longhorn-terminator
+        image: bitnami/kubectl:1.31.4
+        command:
+        - "bin/bash"
+        - "-c"
+        - "kubectl -n argocd patch application longhorn -p '{\"metadata\":{\"finalizers\":null}}' --type=merge && kubectl patch namespace longhorn-system -p '{\"metadata\":{\"finalizers\":null}}' --type=merge"
+      restartPolicy: Never
+  backoffLimit: 5
