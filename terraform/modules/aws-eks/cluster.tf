@@ -31,6 +31,9 @@ module "eks" {
       min_size     = var.min_system_nodes
       max_size     = var.max_system_nodes
       desired_size = var.min_system_nodes
+      labels = {
+        "node-role" = "system"
+      }
     },
     ops = {
       name = "ops"
@@ -40,6 +43,9 @@ module "eks" {
       min_size     = var.min_ops_nodes
       max_size     = var.max_ops_nodes
       desired_size = var.min_ops_nodes
+      labels = {
+        "node-role" = "ops"
+      }
     },
     app = {
       name = "app"
@@ -49,6 +55,9 @@ module "eks" {
       min_size     = var.min_app_nodes
       max_size     = var.max_app_nodes
       desired_size = var.min_app_nodes
+      labels = {
+        "node-role" = "app"
+      }
     }
   }
 }
