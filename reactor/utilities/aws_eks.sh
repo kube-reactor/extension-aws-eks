@@ -1,7 +1,9 @@
 
 function kubernetes_status_aws_eks () {
-  if aws eks describe-cluster --name "$APP_NAME" --region "$AWS_EKS_REGION" 1>/dev/null 2>&1; then
-    return 0
+  if [[ "${AWS_ACCESS_KEY_ID:-}" ]] && [[ "${AWS_SECRET_ACCESS_KEY:-}" ]]; then
+    if aws eks describe-cluster --name "$APP_NAME" --region "$AWS_EKS_REGION" 1>/dev/null 2>&1; then
+      return 0
+    fi
   fi
   return 1
 }
@@ -21,7 +23,7 @@ function add_container_environment_aws_eks () {
     fi
   fi
 
-  if [ ! "${AWS_ACCOUNT_ID:-}" ]; then
+  if [[ ! "${AWS_ACCOUNT_ID:-}" ]] && [[ "${AWS_ACCESS_KEY_ID:-}" ]] && [[ "${AWS_SECRET_ACCESS_KEY:-}" ]]; then
     export AWS_ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
   fi
   export AWS_ECR_REGISTRY_DOMAIN="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_EKS_REGION}.amazonaws.com"
