@@ -35,15 +35,15 @@ if [ "${KUBERNETES_PROVIDER:-}" == "aws_eks" ]; then
   #
   export TF_VAR_eks_name="$APP_NAME"
 
-  export TF_VAR_eks_system_node_instance_type="${AWS_SYSTEM_NODE_TYPE:-"t4g.xlarge"}"
+  export TF_VAR_eks_system_node_instance_type="${AWS_SYSTEM_NODE_TYPE:-"t3.xlarge"}"
   export TF_VAR_eks_min_system_nodes="${AWS_SYSTEM_NODE_MIN_COUNT:-1}"
   export TF_VAR_eks_max_system_nodes="${AWS_SYSTEM_NODE_MAX_COUNT:-1}"
 
-  export TF_VAR_eks_ops_node_instance_type="${AWS_OPS_NODE_TYPE:-"t4g.xlarge"}"
+  export TF_VAR_eks_ops_node_instance_type="${AWS_OPS_NODE_TYPE:-"t3.xlarge"}"
   export TF_VAR_eks_min_ops_nodes="${AWS_OPS_NODE_MIN_COUNT:-0}"
   export TF_VAR_eks_max_ops_nodes="${AWS_OPS_NODE_MAX_COUNT:-0}"
 
-  export TF_VAR_eks_app_node_instance_type="${AWS_APP_NODE_TYPE:-"t4g.xlarge"}"
+  export TF_VAR_eks_app_node_instance_type="${AWS_APP_NODE_TYPE:-"t3.xlarge"}"
   export TF_VAR_eks_min_app_nodes="${AWS_APP_NODE_MIN_COUNT:-0}"
   export TF_VAR_eks_max_app_nodes="${AWS_APP_NODE_MAX_COUNT:-0}"
   #
