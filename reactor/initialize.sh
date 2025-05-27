@@ -34,6 +34,7 @@ if [ "${KUBERNETES_PROVIDER:-}" == "aws_eks" ]; then
   # Kubernetes Cluster
   #
   export TF_VAR_eks_name="$APP_NAME"
+  export TF_VAR_eks_version="${AWS_EKS_VERSION:-"1.32"}"
 
   export TF_VAR_eks_system_node_instance_type="${AWS_SYSTEM_NODE_TYPE:-"t3.xlarge"}"
   export TF_VAR_eks_min_system_nodes="${AWS_SYSTEM_NODE_MIN_COUNT:-1}"
