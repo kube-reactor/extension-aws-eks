@@ -14,6 +14,12 @@ variable "name" {
   type        = string
 }
 
+variable "kube_version" {
+  description = "Kubernetes version"
+  type        = string
+  default     = "1.32"
+}
+
 variable "system_node_instance_type" {
   description = "Kubernetes system node AWS instance type"
   type        = string

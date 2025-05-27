@@ -4,7 +4,8 @@ module "aws-eks" {
   region   = var.region
   vpc_cidr = var.vpc_cidr
 
-  name = var.eks_name
+  name         = var.eks_name
+  kube_version = var.eks_version
 
   system_node_instance_type = var.eks_system_node_instance_type
   min_system_nodes          = var.eks_min_system_nodes

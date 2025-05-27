@@ -19,6 +19,12 @@ variable "eks_name" {
   type        = string
 }
 
+variable "eks_version" {
+  description = "EKS Cluster Kubernetes Version"
+  type        = string
+  default     = "1.32"
+}
+
 variable "eks_system_node_instance_type" {
   description = "Kubernetes system node AWS instance type"
   type        = string
