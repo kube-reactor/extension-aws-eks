@@ -1,54 +1,3 @@
-locals {
-  system_nodes = {
-    system = {
-      name = "system"
-
-      instance_types = [var.system_node_instance_type]
-
-      min_size     = var.min_system_nodes
-      max_size     = var.max_system_nodes
-      desired_size = var.min_system_nodes
-      labels = {
-        "node-role" = "system"
-      }
-    }
-  }
-  ops_nodes = {
-    include = {
-      ops = {
-        name = "ops"
-
-        instance_types = [var.ops_node_instance_type]
-
-        min_size     = var.min_ops_nodes
-        max_size     = var.max_ops_nodes
-        desired_size = var.min_ops_nodes
-        labels = {
-          "node-role" = "ops"
-        }
-      }
-    }
-    empty = {}
-  }
-  app_nodes = {
-    include = {
-      app = {
-        name = "app"
-
-        instance_types = [var.app_node_instance_type]
-
-        min_size     = var.min_app_nodes
-        max_size     = var.max_app_nodes
-        desired_size = var.min_app_nodes
-        labels = {
-          "node-role" = "app"
-        }
-      }
-    }
-    empty = {}
-  }
-}
-
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
@@ -75,6 +24,7 @@ module "eks" {
 
   eks_managed_node_groups = merge(
     local.system_nodes,
+    local.data_nodes,
     local.ops_nodes[var.min_ops_nodes > 0 ? "include" : "empty"],
     local.app_nodes[var.min_app_nodes > 0 ? "include" : "empty"]
   )
