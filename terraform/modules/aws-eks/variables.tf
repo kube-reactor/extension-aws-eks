@@ -20,6 +20,12 @@ variable "kube_version" {
   default     = "1.32"
 }
 
+variable "node_volume_mount_path" {
+  description = "Kubernetes node volume mount path"
+  type        = string
+  default     = "/var/lib/longhorn"
+}
+
 variable "system_node_instance_type" {
   description = "Kubernetes system node AWS instance type"
   type        = string
@@ -44,22 +50,10 @@ variable "data_node_instance_type" {
   default     = "t3.xlarge"
 }
 
-variable "min_data_nodes" {
-  description = "Minimum number of Kubernetes data nodes"
+variable "data_nodes" {
+  description = "Number of Kubernetes data nodes"
   type        = number
   default     = 1
-}
-
-variable "max_data_nodes" {
-  description = "Maximum number of Kubernetes data nodes"
-  type        = number
-  default     = 1
-}
-
-variable "data_node_volume_mount_path" {
-  description = "Kubernetes data node volume mount path"
-  type        = string
-  default     = "/var/lib/longhorn"
 }
 
 variable "data_node_volume_type" {
@@ -88,6 +82,48 @@ variable "data_node_volume_throughput" {
 
 variable "data_node_volume_encrypted" {
   description = "Kubernetes data node volume encryption enabled"
+  type        = bool
+  default     = true
+}
+
+variable "storage_node_instance_type" {
+  description = "Kubernetes storage node AWS instance type"
+  type        = string
+  default     = "t3.medium"
+}
+
+variable "storage_nodes" {
+  description = "Number of Kubernetes storage nodes"
+  type        = number
+  default     = 1
+}
+
+variable "storage_node_volume_type" {
+  description = "Kubernetes storage node volume type"
+  type        = string
+  default     = "gp3"
+}
+
+variable "storage_node_volume_size" {
+  description = "Kubernetes storage node volume size in GB"
+  type        = number
+  default     = 100
+}
+
+variable "storage_node_volume_iops" {
+  description = "Kubernetes storage node volume IOPS"
+  type        = number
+  default     = 3000
+}
+
+variable "storage_node_volume_throughput" {
+  description = "Kubernetes storage node volume throughput"
+  type        = number
+  default     = 125
+}
+
+variable "storage_node_volume_encrypted" {
+  description = "Kubernetes storage node volume encryption enabled"
   type        = bool
   default     = true
 }

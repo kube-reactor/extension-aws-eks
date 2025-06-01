@@ -36,19 +36,27 @@ if [ "${KUBERNETES_PROVIDER:-}" == "aws_eks" ]; then
   export TF_VAR_eks_name="$APP_NAME"
   export TF_VAR_eks_version="${AWS_EKS_VERSION:-"1.32"}"
 
+  export TF_VAR_eks_node_volume_mount_path="${AWS_NODE_VOLUME_MOUNT_PATH:-"/var/lib/longhorn"}"
+
   export TF_VAR_eks_system_node_instance_type="${AWS_SYSTEM_NODE_TYPE:-"t3.xlarge"}"
   export TF_VAR_eks_min_system_nodes="${AWS_SYSTEM_NODE_MIN_COUNT:-1}"
   export TF_VAR_eks_max_system_nodes="${AWS_SYSTEM_NODE_MAX_COUNT:-1}"
 
   export TF_VAR_eks_data_node_instance_type="${AWS_DATA_NODE_TYPE:-"t3.xlarge"}"
-  export TF_VAR_eks_min_data_nodes="${AWS_DATA_NODE_MIN_COUNT:-1}"
-  export TF_VAR_eks_max_data_nodes="${AWS_DATA_NODE_MAX_COUNT:-1}"
-  export TF_VAR_eks_data_node_volume_mount_path="${AWS_DATA_NODE_VOLUME_MOUNT_PATH:-"/var/lib/longhorn"}"
+  export TF_VAR_eks_data_nodes="${AWS_DATA_NODE_COUNT:-1}"
   export TF_VAR_eks_data_node_volume_type="${AWS_DATA_NODE_VOLUME_TYPE:-"gp3"}"
   export TF_VAR_eks_data_node_volume_size="${AWS_DATA_NODE_VOLUME_SIZE:-100}"
   export TF_VAR_eks_data_node_volume_iops="${AWS_DATA_NODE_VOLUME_IOPS:-3000}"
   export TF_VAR_eks_data_node_volume_throughput="${AWS_DATA_NODE_VOLUME_THROUGHPUT:-125}"
   export TF_VAR_eks_data_node_volume_encrypted="${AWS_DATA_NODE_VOLUME_ENCRYPTED:-true}"
+
+  export TF_VAR_eks_storage_node_instance_type="${AWS_STORAGE_NODE_TYPE:-"t3.medium"}"
+  export TF_VAR_eks_storage_nodes="${AWS_STORAGE_NODE_COUNT:-1}"
+  export TF_VAR_eks_storage_node_volume_type="${AWS_STORAGE_NODE_VOLUME_TYPE:-"gp3"}"
+  export TF_VAR_eks_storage_node_volume_size="${AWS_STORAGE_NODE_VOLUME_SIZE:-100}"
+  export TF_VAR_eks_storage_node_volume_iops="${AWS_STORAGE_NODE_VOLUME_IOPS:-3000}"
+  export TF_VAR_eks_storage_node_volume_throughput="${AWS_STORAGE_NODE_VOLUME_THROUGHPUT:-125}"
+  export TF_VAR_eks_storage_node_volume_encrypted="${AWS_STORAGE_NODE_VOLUME_ENCRYPTED:-true}"
 
   export TF_VAR_eks_ops_node_instance_type="${AWS_OPS_NODE_TYPE:-"t3.xlarge"}"
   export TF_VAR_eks_min_ops_nodes="${AWS_OPS_NODE_MIN_COUNT:-0}"

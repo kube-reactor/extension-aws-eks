@@ -1,6 +1,6 @@
 
 locals {
-  disk_attachments = {
+  data_disk_attachments = {
     sdx = {
       device_name = "/dev/sdx"
       ebs = {
@@ -13,6 +13,23 @@ locals {
       }
     }
   }
+  storage_disk_attachments = {
+    sdx = {
+      device_name = "/dev/sdx"
+      ebs = {
+        volume_size           = var.storage_node_volume_size
+        volume_type           = var.storage_node_volume_type
+        iops                  = var.storage_node_volume_iops
+        throughput            = var.storage_node_volume_throughput
+        encrypted             = var.storage_node_volume_encrypted
+        delete_on_termination = true
+      }
+    }
+  }
+
+  worker_instance_user_data = <<-EOT
+yum -y install iscsi-initiator-utils
+EOT
 
   storage_instance_user_data = <<-EOT
 yum -y install iscsi-initiator-utils xfsprogs
@@ -20,7 +37,7 @@ yum -y install iscsi-initiator-utils xfsprogs
 MOUNT_POINT=$(lsblk -o MOUNTPOINT -nr /dev/sdx)
 if [[ -z "$MOUNT_POINT" ]]
 then
-  MOUNT_POINT=${var.data_node_volume_mount_path}
+  MOUNT_POINT=${var.node_volume_mount_path}
   FILE_SYSTEM=$(lsblk -o FSTYPE -nr /dev/sdx)
 
   if [[ $FILE_SYSTEM != 'xfs' ]]
@@ -53,30 +70,56 @@ EOT
       max_size     = var.max_system_nodes
       desired_size = var.min_system_nodes
 
+      pre_bootstrap_user_data = local.worker_instance_user_data
+
       labels = {
         "node-role" = "system"
       }
     }
   }
   data_nodes = {
-    data = {
-      name = "data"
+    include = {
+      data = {
+        name = "data"
 
-      instance_types = [var.data_node_instance_type]
+        instance_types = [var.data_node_instance_type]
 
-      min_size     = var.min_data_nodes
-      max_size     = var.max_data_nodes
-      desired_size = var.min_data_nodes
+        min_size     = var.data_nodes
+        max_size     = var.data_nodes
+        desired_size = var.data_nodes
 
-      ebs_optimized           = true
-      block_device_mappings   = local.disk_attachments
-      pre_bootstrap_user_data = local.storage_instance_user_data
+        ebs_optimized           = true
+        block_device_mappings   = local.data_disk_attachments
+        pre_bootstrap_user_data = local.storage_instance_user_data
 
-      labels = {
-        "node-role"                            = "data"
-        "node.longhorn.io/create-default-disk" = "true"
+        labels = {
+          "node-role" = "data"
+        }
       }
     }
+    empty = {}
+  }
+  storage_nodes = {
+    include = {
+      storage = {
+        name = "storage"
+
+        instance_types = [var.storage_node_instance_type]
+
+        min_size     = var.storage_nodes
+        max_size     = var.storage_nodes
+        desired_size = var.storage_nodes
+
+        ebs_optimized           = true
+        block_device_mappings   = local.storage_disk_attachments
+        pre_bootstrap_user_data = local.storage_instance_user_data
+
+        labels = {
+          "node-role" = "storage"
+        }
+      }
+    }
+    empty = {}
   }
   ops_nodes = {
     include = {
@@ -88,6 +131,8 @@ EOT
         min_size     = var.min_ops_nodes
         max_size     = var.max_ops_nodes
         desired_size = var.min_ops_nodes
+
+        pre_bootstrap_user_data = local.worker_instance_user_data
 
         labels = {
           "node-role" = "ops"
@@ -106,6 +151,8 @@ EOT
         min_size     = var.min_app_nodes
         max_size     = var.max_app_nodes
         desired_size = var.min_app_nodes
+
+        pre_bootstrap_user_data = local.worker_instance_user_data
 
         labels = {
           "node-role" = "app"

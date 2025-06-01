@@ -24,9 +24,10 @@ module "eks" {
 
   eks_managed_node_groups = merge(
     local.system_nodes,
-    local.data_nodes,
-    local.ops_nodes[var.min_ops_nodes > 0 ? "include" : "empty"],
-    local.app_nodes[var.min_app_nodes > 0 ? "include" : "empty"]
+    local.data_nodes[var.data_nodes > 0 ? "include" : "empty"],
+    local.storage_nodes[var.storage_nodes > 0 ? "include" : "empty"],
+    local.ops_nodes[var.max_ops_nodes > 0 ? "include" : "empty"],
+    local.app_nodes[var.max_app_nodes > 0 ? "include" : "empty"]
   )
 }
 

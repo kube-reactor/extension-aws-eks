@@ -25,6 +25,12 @@ variable "eks_version" {
   default     = "1.32"
 }
 
+variable "eks_node_volume_mount_path" {
+  description = "Kubernetes node volume mount path"
+  type        = string
+  default     = "/var/lib/longhorn"
+}
+
 variable "eks_system_node_instance_type" {
   description = "Kubernetes system node AWS instance type"
   type        = string
@@ -49,22 +55,10 @@ variable "eks_data_node_instance_type" {
   default     = "t3.xlarge"
 }
 
-variable "eks_min_data_nodes" {
-  description = "Minimum number of Kubernetes data nodes"
+variable "eks_data_nodes" {
+  description = "Number of Kubernetes data nodes"
   type        = number
   default     = 1
-}
-
-variable "eks_max_data_nodes" {
-  description = "Maximum number of Kubernetes data nodes"
-  type        = number
-  default     = 1
-}
-
-variable "eks_data_node_volume_mount_path" {
-  description = "Kubernetes data node volume mount path"
-  type        = string
-  default     = "/var/lib/longhorn"
 }
 
 variable "eks_data_node_volume_type" {
@@ -93,6 +87,48 @@ variable "eks_data_node_volume_throughput" {
 
 variable "eks_data_node_volume_encrypted" {
   description = "Kubernetes data node volume encryption enabled"
+  type        = bool
+  default     = true
+}
+
+variable "eks_storage_node_instance_type" {
+  description = "Kubernetes storage node AWS instance type"
+  type        = string
+  default     = "t3.medium"
+}
+
+variable "eks_storage_nodes" {
+  description = "Number of Kubernetes storage nodes"
+  type        = number
+  default     = 1
+}
+
+variable "eks_storage_node_volume_type" {
+  description = "Kubernetes storage node volume type"
+  type        = string
+  default     = "gp3"
+}
+
+variable "eks_storage_node_volume_size" {
+  description = "Kubernetes storage node volume size in GB"
+  type        = number
+  default     = 100
+}
+
+variable "eks_storage_node_volume_iops" {
+  description = "Kubernetes storage node volume IOPS"
+  type        = number
+  default     = 3000
+}
+
+variable "eks_storage_node_volume_throughput" {
+  description = "Kubernetes storage node volume throughput"
+  type        = number
+  default     = 125
+}
+
+variable "eks_storage_node_volume_encrypted" {
+  description = "Kubernetes storage node volume encryption enabled"
   type        = bool
   default     = true
 }
